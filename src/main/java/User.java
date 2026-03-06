@@ -1,6 +1,5 @@
 import jakarta.persistence.*;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "users")
@@ -11,16 +10,16 @@ public class User {
     private long id;
 
     @Column
-    private String name;
+    private String name = "";
 
     @Column(unique = true)
-    private String email;
+    private String email = "";
 
     @Column
     private int age;
 
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private LocalDate createdAt = LocalDate.now();
 
     public User() {}
 
@@ -28,7 +27,6 @@ public class User {
         this.name = name;
         this.email = email;
         this.age = age;
-        this.createdAt = ZonedDateTime.now();
     }
 
     public long getId() { return this.id; }
@@ -43,12 +41,12 @@ public class User {
     public int getAge() { return age; }
     public void setAge(int age) { this.age = age; }
 
-    public ZonedDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(ZonedDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDate getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
 
     @Override
     public String toString() {
-        return "Пользователь: " + name +
+        return "Имя: " + name +
                 "; E-mail: " + email +
                 "; возраст: " + age +
                 "; создан: " + createdAt;
