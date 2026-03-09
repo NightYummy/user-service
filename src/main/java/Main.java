@@ -5,5 +5,6 @@ public class Main {
         while (running) {
             running = Menu.mainMenu();
         }
+        ConnectionConfiguration.shutdown();
     }
 }

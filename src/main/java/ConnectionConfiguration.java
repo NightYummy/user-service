@@ -15,4 +15,8 @@ public final class ConnectionConfiguration {
     public static Session getSession() {
         return sessionFactory.openSession();
     }
+
+    public static void shutdown() {
+        sessionFactory.close();
+    }
 }
