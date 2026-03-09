@@ -3,6 +3,7 @@ import java.util.Scanner;
 public final class Menu {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private static final IUserDAO userDAO = new UserDAO();
 
     public static boolean mainMenu() {
         System.out.println("\n========== ГЛАВНОЕ МЕНЮ ==========");
@@ -50,7 +51,7 @@ public final class Menu {
 
         String choice = scanner.nextLine().trim().toLowerCase();
         switch (choice) {
-            case "да", "д", "yes", "y": UserDAO.deleteUser(user); break;
+            case "да", "д", "yes", "y": userDAO.deleteUser(user); break;
             case "нет", "н", "no", "n", "": userMenu(user);
             default:
                 System.out.println("Неверный ввод! Пожалуйста, выберите пункт из меню");
@@ -108,7 +109,7 @@ public final class Menu {
                         continue;
                     }
                     user.setEmail(email);
-                    if (UserDAO.getUserByEmail(email) != null) {
+                    if (userDAO.getUserByEmail(email) != null) {
                         System.out.print("Пользователь с таким E-mail уже существует\n");
                         user.setEmail(oldEmail);
                         continue;
@@ -136,7 +137,7 @@ public final class Menu {
             default:
                 System.out.println("Неверный ввод! Пожалуйста, выберите пункт из меню");
         }
-        UserDAO.updateUser(user);
+        userDAO.updateUser(user);
     }
 
     private static void createUser() {
@@ -174,7 +175,7 @@ public final class Menu {
             if (input > 100) System.out.println("Возраст указан некорректно");
             else user.setAge(input);
         }
-        UserDAO.saveUser(user);
+        userDAO.saveUser(user);
         System.out.println("Пользователь сохранен\n");
     }
 
@@ -188,7 +189,7 @@ public final class Menu {
             return;
         }
 
-        User user = UserDAO.getUserByEmail(input);
+        User user = userDAO.getUserByEmail(input);
         if (user == null) {
             System.out.println("\nПользователь с таким E-mail не найден\n");
             return;

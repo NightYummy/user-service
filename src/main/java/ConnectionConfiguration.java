@@ -1,5 +1,4 @@
 import org.hibernate.Session;
-import org.hibernate.SessionBuilder;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 

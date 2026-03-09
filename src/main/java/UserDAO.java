@@ -1,9 +1,10 @@
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public final class UserDAO {
+public final class UserDAO implements IUserDAO {
 
-    public static void saveUser(User user) {
+    @Override
+    public void saveUser(User user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
             transaction = session.beginTransaction();
@@ -17,7 +18,8 @@ public final class UserDAO {
         }
     }
 
-    public static User getUserByEmail(String email) {
+    @Override
+    public User getUserByEmail(String email) {
         try (Session session = ConnectionConfiguration.getSession()) {
             return session.createQuery(
                 "FROM User WHERE email = :email", User.class)
@@ -30,7 +32,8 @@ public final class UserDAO {
         }
     }
 
-    public static void updateUser(User user) {
+    @Override
+    public void updateUser(User user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
             transaction = session.beginTransaction();
@@ -44,7 +47,8 @@ public final class UserDAO {
         }
     }
 
-    public static void deleteUser(User user) {
+    @Override
+    public void deleteUser(User user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
             transaction = session.beginTransaction();
