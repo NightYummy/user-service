@@ -1,11 +1,19 @@
 import java.util.Scanner;
 
-public final class Menu {
+public final class UserService {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private static final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO;
 
-    public static boolean mainMenu() {
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    public UserService() {
+        this(new UserDAO());
+    }
+
+    public boolean mainMenu() {
         System.out.println("\n========== ГЛАВНОЕ МЕНЮ ==========");
         System.out.println("1 - Создать пользователя");
         System.out.println("2 - Найти пользователя по E-mail");
@@ -26,7 +34,7 @@ public final class Menu {
         return false;
     }
 
-    private static void userMenu(UserDTO user) {
+    private void userMenu(UserDTO user) {
         System.out.println("\n========== МЕНЮ ПОЛЬЗОВАТЕЛЯ ==========");
         System.out.println(user);
         System.out.println("1 - Редактировать данные пользователя");
@@ -44,7 +52,7 @@ public final class Menu {
         }
     }
 
-    private static void deleteUserMenu(UserDTO user) {
+    private void deleteUserMenu(UserDTO user) {
         scanner.nextLine();
         System.out.println("Пользователь будет удален");
         System.out.print("Вы уверены? да/нет ('нет' по умолчанию): ");
@@ -59,7 +67,7 @@ public final class Menu {
         System.out.println("\nПользователь был удален");
     }
 
-    private static void deleteAllUsersMenu() {
+    private void deleteAllUsersMenu() {
         scanner.nextLine();
         System.out.println("\n!!! Внимание !!!");
         System.out.println("Все пользователи будут удалены");
@@ -75,7 +83,7 @@ public final class Menu {
         System.out.println("\nВсе пользователи были удалены\n");
     }
 
-    private static void updateUserMenu(UserDTO user) {
+    private void updateUserMenu(UserDTO user) {
         System.out.println("\n========== РЕДАКТИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ ==========");
         System.out.println(user);
         System.out.println("1 - Редактировать имя");
@@ -100,7 +108,6 @@ public final class Menu {
                 break;
             case 2:
                 scanner.nextLine();
-                String oldEmail = user.getEmail();
                 while (true) {
                     System.out.print("Введите новый E-mail пользователя: ");
                     String email = scanner.nextLine().trim();
@@ -141,7 +148,7 @@ public final class Menu {
         userDAO.updateUser(user);
     }
 
-    private static void createUser() {
+    private void createUser() {
         scanner.nextLine();
         UserDTO user = new UserDTO();
 
@@ -180,7 +187,7 @@ public final class Menu {
         System.out.println("Пользователь сохранен\n");
     }
 
-    private static void findUser() {
+    private void findUser() {
         scanner.nextLine();
         System.out.print("Введите E-mail пользователя: ");
         String input = scanner.nextLine();

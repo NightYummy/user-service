@@ -4,19 +4,27 @@ import org.hibernate.cfg.Configuration;
 
 public final class ConnectionConfiguration {
 
-    private static final SessionFactory sessionFactory;
+    private final SessionFactory sessionFactory;
 
-    static {
-        Configuration configuration = new Configuration().configure();
-        configuration.addAnnotatedClasses(User.class);
+    public ConnectionConfiguration(String configFile) {
+        Configuration configuration = new Configuration().configure(configFile);
+        configuration.addAnnotatedClass(User.class);
         sessionFactory = configuration.buildSessionFactory();
     }
 
-    public static Session getSession() {
+    public ConnectionConfiguration(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public ConnectionConfiguration() {
+        this("hibernate.cfg.xml");
+    }
+
+    public Session getSession() {
         return sessionFactory.openSession();
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         sessionFactory.close();
     }
 }
