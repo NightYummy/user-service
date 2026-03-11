@@ -43,12 +43,4 @@ public class User {
 
     public LocalDate getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDate createdAt) { this.createdAt = createdAt; }
-
-    @Override
-    public String toString() {
-        return "Имя: " + name +
-                "; E-mail: " + email +
-                "; возраст: " + age +
-                "; создан: " + createdAt;
-    }
 }

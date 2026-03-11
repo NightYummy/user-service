@@ -1,14 +1,14 @@
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public final class UserDAO implements IUserDAO {
+public class UserDAO implements IUserDAO, UserDTOMapper {
 
     @Override
-    public void saveUser(User user) {
+    public void saveUser(UserDTO user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
             transaction = session.beginTransaction();
-            session.persist(user);
+            session.persist(mapToUser(user));
             transaction.commit();
 
         } catch (Exception e) {
@@ -19,7 +19,12 @@ public final class UserDAO implements IUserDAO {
     }
 
     @Override
-    public User getUserByEmail(String email) {
+    public UserDTO getUserByEmail(String email) {
+        User user = getUserEntityByEmail(email);
+        return mapToDTO(user);
+    }
+
+    private User getUserEntityByEmail(String email) {
         try (Session session = ConnectionConfiguration.getSession()) {
             return session.createQuery(
                 "FROM User WHERE email = :email", User.class)
@@ -33,11 +38,19 @@ public final class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void updateUser(User user) {
+    public void updateUser(UserDTO user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
+            User existing = getUserEntityByEmail(user.getEmail());
+
+            if (existing == null) return;
+
+            existing.setName(user.getName());
+            existing.setEmail(user.getEmail());
+            existing.setAge(user.getAge());
+
             transaction = session.beginTransaction();
-            session.merge(user);
+            session.merge(existing);
             transaction.commit();
 
         } catch (Exception e) {
@@ -48,11 +61,11 @@ public final class UserDAO implements IUserDAO {
     }
 
     @Override
-    public void deleteUser(User user) {
+    public void deleteUser(UserDTO user) {
         Transaction transaction = null;
         try (Session session = ConnectionConfiguration.getSession()) {
             transaction = session.beginTransaction();
-            session.remove(user);
+            session.remove(getUserEntityByEmail(user.getEmail()));
             transaction.commit();
 
         } catch (Exception e) {
@@ -62,7 +75,7 @@ public final class UserDAO implements IUserDAO {
         }
     }
 
-    public static void clearTable() {
+    public void clearTable() {
         try (Session session = ConnectionConfiguration.getSession()) {
             session.beginTransaction();
             session.createMutationQuery("DELETE FROM User").executeUpdate();
@@ -73,12 +86,19 @@ public final class UserDAO implements IUserDAO {
         }
     }
 
-    public static boolean userExists(User user) {
-        try (Session session = ConnectionConfiguration.getSession()) {
-            return session.createQuery(
-                "FROM User WHERE email = :email", User.class)
-                .setParameter("email", user.getEmail())
-                .uniqueResult() != null;
-        }
+    public boolean userExists(UserDTO user) {
+        return getUserEntityByEmail(user.getEmail()) != null;
+    }
+
+    @Override
+    public UserDTO mapToDTO(User user) {
+        if (user == null) return null;
+        return new UserDTO(user);
+    }
+
+    @Override
+    public User mapToUser(UserDTO dto) {
+        if (dto == null) return null;
+        return new User(dto.getName(), dto.getEmail(), dto.getAge());
     }
 }
