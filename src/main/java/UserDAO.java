@@ -56,8 +56,27 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             if (existing == null) return;
 
             existing.setName(user.getName());
-            existing.setEmail(user.getEmail());
             existing.setAge(user.getAge());
+
+            transaction = session.beginTransaction();
+            session.merge(existing);
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void updateUserEmail(UserDTO user, String newEmail) {
+        Transaction transaction = null;
+        try (Session session = connection.getSession()) {
+            User existing = getUserEntityByEmail(user.getEmail());
+
+            if (userExists(newEmail)) return;
+
+            existing.setEmail(newEmail);
 
             transaction = session.beginTransaction();
             session.merge(existing);
@@ -98,6 +117,10 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
 
     public boolean userExists(UserDTO user) {
         return getUserEntityByEmail(user.getEmail()) != null;
+    }
+
+    public boolean userExists(String email) {
+        return getUserEntityByEmail(email) != null;
     }
 
     @Override

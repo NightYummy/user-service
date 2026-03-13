@@ -10,6 +10,12 @@ public class UserDTO {
         this.age = user.getAge();
     }
 
+    public UserDTO(String name, String email, int age) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+    }
+
     public UserDTO() {
         this(new User());
     }

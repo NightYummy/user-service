@@ -119,9 +119,7 @@ public final class UserService {
                         System.out.print("Пользователь с таким E-mail уже существует\n");
                         continue;
                     }
-                    userDAO.deleteUser(user);
-                    user.setEmail(email);
-                    userDAO.saveUser(user);
+                    userDAO.updateUserEmail(user, email);
                     break;
                 }
                 break;
