@@ -21,7 +21,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             session.persist(mapToUser(user));
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
@@ -41,7 +41,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
                 .setParameter("email", email)
                 .uniqueResult();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -62,7 +62,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             session.merge(existing);
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
@@ -82,7 +82,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             session.merge(existing);
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
@@ -97,7 +97,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             session.remove(getUserEntityByEmail(user.getEmail()));
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
@@ -110,7 +110,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
             session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
     }
