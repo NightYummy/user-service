@@ -1,10 +1,19 @@
 import java.util.Scanner;
 
-public final class Menu {
+public final class UserService {
 
     private static final Scanner scanner = new Scanner(System.in);
+    private final UserDAO userDAO;
 
-    public static boolean mainMenu() {
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    public UserService() {
+        this(new UserDAO());
+    }
+
+    public boolean mainMenu() {
         System.out.println("\n========== ГЛАВНОЕ МЕНЮ ==========");
         System.out.println("1 - Создать пользователя");
         System.out.println("2 - Найти пользователя по E-mail");
@@ -25,7 +34,7 @@ public final class Menu {
         return false;
     }
 
-    private static void userMenu(User user) {
+    private void userMenu(UserDTO user) {
         System.out.println("\n========== МЕНЮ ПОЛЬЗОВАТЕЛЯ ==========");
         System.out.println(user);
         System.out.println("1 - Редактировать данные пользователя");
@@ -43,14 +52,14 @@ public final class Menu {
         }
     }
 
-    private static void deleteUserMenu(User user) {
+    private void deleteUserMenu(UserDTO user) {
         scanner.nextLine();
         System.out.println("Пользователь будет удален");
         System.out.print("Вы уверены? да/нет ('нет' по умолчанию): ");
 
         String choice = scanner.nextLine().trim().toLowerCase();
         switch (choice) {
-            case "да", "д", "yes", "y": UserDAO.deleteUser(user); break;
+            case "да", "д", "yes", "y": userDAO.deleteUser(user); break;
             case "нет", "н", "no", "n", "": userMenu(user);
             default:
                 System.out.println("Неверный ввод! Пожалуйста, выберите пункт из меню");
@@ -58,7 +67,7 @@ public final class Menu {
         System.out.println("\nПользователь был удален");
     }
 
-    private static void deleteAllUsersMenu() {
+    private void deleteAllUsersMenu() {
         scanner.nextLine();
         System.out.println("\n!!! Внимание !!!");
         System.out.println("Все пользователи будут удалены");
@@ -66,7 +75,7 @@ public final class Menu {
 
         String choice = scanner.nextLine().trim().toLowerCase();
         switch (choice) {
-            case "да", "д", "yes", "y": UserDAO.clearTable(); break;
+            case "да", "д", "yes", "y": userDAO.clearTable(); break;
             case "нет", "н", "no", "n", "": System.out.println(); return;
             default:
                 System.out.println("\nНеверный ввод! Пожалуйста, выберите пункт из меню\n");
@@ -74,7 +83,7 @@ public final class Menu {
         System.out.println("\nВсе пользователи были удалены\n");
     }
 
-    private static void updateUserMenu(User user) {
+    private void updateUserMenu(UserDTO user) {
         System.out.println("\n========== РЕДАКТИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ ==========");
         System.out.println(user);
         System.out.println("1 - Редактировать имя");
@@ -99,7 +108,6 @@ public final class Menu {
                 break;
             case 2:
                 scanner.nextLine();
-                String oldEmail = user.getEmail();
                 while (true) {
                     System.out.print("Введите новый E-mail пользователя: ");
                     String email = scanner.nextLine().trim();
@@ -107,12 +115,11 @@ public final class Menu {
                         System.out.print("\nE-mail указан неверно");
                         continue;
                     }
-                    user.setEmail(email);
-                    if (UserDAO.getUserByEmail(email) != null) {
+                    if (userDAO.getUserByEmail(email) != null) {
                         System.out.print("Пользователь с таким E-mail уже существует\n");
-                        user.setEmail(oldEmail);
                         continue;
                     }
+                    userDAO.updateUserEmail(user, email);
                     break;
                 }
                 break;
@@ -136,12 +143,12 @@ public final class Menu {
             default:
                 System.out.println("Неверный ввод! Пожалуйста, выберите пункт из меню");
         }
-        UserDAO.updateUser(user);
+        userDAO.updateUser(user);
     }
 
-    private static void createUser() {
+    private void createUser() {
         scanner.nextLine();
-        User user = new User();
+        UserDTO user = new UserDTO();
 
         while (user.getName().isEmpty()) {
             System.out.print("\nВведите имя пользователя: ");
@@ -158,7 +165,7 @@ public final class Menu {
                 continue;
             }
             user.setEmail(input);
-            if (UserDAO.userExists(user)) {
+            if (userDAO.userExists(user)) {
                 System.out.print("Пользователь с таким E-mail уже существует\n");
                 user.setEmail("");
             }
@@ -174,11 +181,11 @@ public final class Menu {
             if (input > 100) System.out.println("Возраст указан некорректно");
             else user.setAge(input);
         }
-        UserDAO.saveUser(user);
+        userDAO.saveUser(user);
         System.out.println("Пользователь сохранен\n");
     }
 
-    private static void findUser() {
+    private void findUser() {
         scanner.nextLine();
         System.out.print("Введите E-mail пользователя: ");
         String input = scanner.nextLine();
@@ -188,7 +195,7 @@ public final class Menu {
             return;
         }
 
-        User user = UserDAO.getUserByEmail(input);
+        UserDTO user = userDAO.getUserByEmail(input);
         if (user == null) {
             System.out.println("\nПользователь с таким E-mail не найден\n");
             return;

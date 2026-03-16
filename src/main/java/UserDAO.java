@@ -1,80 +1,137 @@
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public final class UserDAO {
+public class UserDAO implements IUserDAO, UserDTOMapper {
 
-    public static void saveUser(User user) {
+    private final ConnectionConfiguration connection;
+
+    public UserDAO(ConnectionConfiguration connection) {
+        this.connection = connection;
+    }
+
+    public UserDAO() {
+        this(new ConnectionConfiguration());
+    }
+
+    @Override
+    public void saveUser(UserDTO user) {
         Transaction transaction = null;
-        try (Session session = ConnectionConfiguration.getSession()) {
+        try (Session session = connection.getSession()) {
             transaction = session.beginTransaction();
-            session.persist(user);
+            session.persist(mapToUser(user));
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
         }
     }
 
-    public static User getUserByEmail(String email) {
-        try (Session session = ConnectionConfiguration.getSession()) {
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        User user = getUserEntityByEmail(email);
+        return mapToDTO(user);
+    }
+
+    private User getUserEntityByEmail(String email) {
+        try (Session session = connection.getSession()) {
             return session.createQuery(
                 "FROM User WHERE email = :email", User.class)
                 .setParameter("email", email)
                 .uniqueResult();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
 
-    public static void updateUser(User user) {
+    @Override
+    public void updateUser(UserDTO user) {
         Transaction transaction = null;
-        try (Session session = ConnectionConfiguration.getSession()) {
+        try (Session session = connection.getSession()) {
+            User existing = getUserEntityByEmail(user.getEmail());
+
+            if (existing == null) return;
+
+            existing.setName(user.getName());
+            existing.setAge(user.getAge());
+
             transaction = session.beginTransaction();
-            session.merge(user);
+            session.merge(existing);
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
         }
     }
 
-    public static void deleteUser(User user) {
+    public void updateUserEmail(UserDTO user, String newEmail) {
         Transaction transaction = null;
-        try (Session session = ConnectionConfiguration.getSession()) {
+        try (Session session = connection.getSession()) {
+            User existing = getUserEntityByEmail(user.getEmail());
+
+            if (userExists(newEmail)) return;
+
+            existing.setEmail(newEmail);
+
             transaction = session.beginTransaction();
-            session.remove(user);
+            session.merge(existing);
             transaction.commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.out.println(e.getMessage());
         }
     }
 
-    public static void clearTable() {
-        try (Session session = ConnectionConfiguration.getSession()) {
+    @Override
+    public void deleteUser(UserDTO user) {
+        Transaction transaction = null;
+        try (Session session = connection.getSession()) {
+            transaction = session.beginTransaction();
+            session.remove(getUserEntityByEmail(user.getEmail()));
+            transaction.commit();
+
+        } catch (RuntimeException e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void clearTable() {
+        try (Session session = connection.getSession()) {
             session.beginTransaction();
             session.createMutationQuery("DELETE FROM User").executeUpdate();
             session.getTransaction().commit();
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public static boolean userExists(User user) {
-        try (Session session = ConnectionConfiguration.getSession()) {
-            return session.createQuery(
-                "FROM User WHERE email = :email", User.class)
-                .setParameter("email", user.getEmail())
-                .uniqueResult() != null;
-        }
+    public boolean userExists(UserDTO user) {
+        return getUserEntityByEmail(user.getEmail()) != null;
+    }
+
+    public boolean userExists(String email) {
+        return getUserEntityByEmail(email) != null;
+    }
+
+    @Override
+    public UserDTO mapToDTO(User user) {
+        if (user == null) return null;
+        return new UserDTO(user);
+    }
+
+    @Override
+    public User mapToUser(UserDTO dto) {
+        if (dto == null) return null;
+        return new User(dto.getName(), dto.getEmail(), dto.getAge());
     }
 }
