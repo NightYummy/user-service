@@ -1,3 +1,7 @@
+package dto;
+
+import entities.User;
+
 public class UserDTO {
 
     private String name;

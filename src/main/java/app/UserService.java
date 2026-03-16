@@ -1,16 +1,21 @@
+package app;
+
+import dao.UserDAOImpl;
+import dto.UserDTO;
+
 import java.util.Scanner;
 
 public final class UserService {
 
     private static final Scanner scanner = new Scanner(System.in);
-    private final UserDAO userDAO;
+    private final UserDAOImpl userDAO;
 
-    public UserService(UserDAO userDAO) {
+    public UserService(UserDAOImpl userDAO) {
         this.userDAO = userDAO;
     }
 
     public UserService() {
-        this(new UserDAO());
+        this(new UserDAOImpl());
     }
 
     public boolean mainMenu() {
