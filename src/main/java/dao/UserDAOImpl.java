@@ -1,15 +1,21 @@
+package dao;
+
+import app.ConnectionConfiguration;
+import dto.UserDTO;
+import dto.UserDTOMapper;
+import entities.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public class UserDAO implements IUserDAO, UserDTOMapper {
+public class UserDAOImpl implements UserDAO, UserDTOMapper {
 
     private final ConnectionConfiguration connection;
 
-    public UserDAO(ConnectionConfiguration connection) {
+    public UserDAOImpl(ConnectionConfiguration connection) {
         this.connection = connection;
     }
 
-    public UserDAO() {
+    public UserDAOImpl() {
         this(new ConnectionConfiguration());
     }
 
@@ -37,7 +43,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
     private User getUserEntityByEmail(String email) {
         try (Session session = connection.getSession()) {
             return session.createQuery(
-                "FROM User WHERE email = :email", User.class)
+                "FROM entities.User WHERE email = :email", User.class)
                 .setParameter("email", email)
                 .uniqueResult();
 
@@ -107,7 +113,7 @@ public class UserDAO implements IUserDAO, UserDTOMapper {
     public void clearTable() {
         try (Session session = connection.getSession()) {
             session.beginTransaction();
-            session.createMutationQuery("DELETE FROM User").executeUpdate();
+            session.createMutationQuery("DELETE FROM entities.User").executeUpdate();
             session.getTransaction().commit();
 
         } catch (RuntimeException e) {

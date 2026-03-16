@@ -1,3 +1,7 @@
+import app.ConnectionConfiguration;
+import dao.UserDAOImpl;
+import dto.UserDTO;
+import entities.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -13,7 +17,7 @@ import java.util.Properties;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
-public class UserDAOIT {
+public class UserDAOITImpl {
 
     @Container
     private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest")
@@ -21,7 +25,7 @@ public class UserDAOIT {
         .withUsername("test")
         .withPassword("test");
     private static SessionFactory sessionFactory;
-    private UserDAO userDAO;
+    private UserDAOImpl userDAO;
 
     @BeforeAll
     static void setup() {
@@ -47,11 +51,11 @@ public class UserDAOIT {
     void clearTable() {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            session.createMutationQuery("DELETE FROM User").executeUpdate();
+            session.createMutationQuery("DELETE FROM entities.User").executeUpdate();
             session.getTransaction().commit();
         }
         ConnectionConfiguration connection = new ConnectionConfiguration(sessionFactory);
-        userDAO = new UserDAO(connection);
+        userDAO = new UserDAOImpl(connection);
     }
 
     @Test

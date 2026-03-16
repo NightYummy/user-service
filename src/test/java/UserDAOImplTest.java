@@ -1,3 +1,7 @@
+import app.ConnectionConfiguration;
+import dao.UserDAOImpl;
+import dto.UserDTO;
+import entities.User;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -11,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserDAOTest {
+public class UserDAOImplTest {
 
     @Mock
     private ConnectionConfiguration connection;
@@ -26,7 +30,7 @@ public class UserDAOTest {
     private Query<User> query;
 
     @InjectMocks
-    private UserDAO userDAO;
+    private UserDAOImpl userDAO;
 
     @BeforeEach
     void setup() {

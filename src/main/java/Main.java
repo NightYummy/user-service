@@ -1,8 +1,12 @@
+import app.ConnectionConfiguration;
+import app.UserService;
+import dao.UserDAOImpl;
+
 public class Main {
 
     public static void main(String[] args) {
         ConnectionConfiguration connection = new ConnectionConfiguration();
-        UserDAO userDAO = new UserDAO(connection);
+        UserDAOImpl userDAO = new UserDAOImpl(connection);
         UserService service = new UserService(userDAO);
 
         boolean running = true;

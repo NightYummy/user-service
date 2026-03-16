@@ -1,4 +1,8 @@
-public interface IUserDAO {
+package dao;
+
+import dto.UserDTO;
+
+public interface UserDAO {
 
     void saveUser(UserDTO user);
     UserDTO getUserByEmail(String email);
