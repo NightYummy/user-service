@@ -1,11 +1,21 @@
-package dto;
+package com.nightyummy.dto;
 
-import entities.User;
+import com.nightyummy.entity.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 
 public class UserDTO {
 
+    @Pattern(regexp = "^\\p{L}+$", message = "Некорректное имя")
     private String name;
+
+    @Email(message = "Некорректный E-mail")
     private String email;
+
+    @Min(value = 18, message = "Возраст не может менее 18")
+    @Max(value = 100, message = "Возраст не может более 100")
     private int age;
 
     public UserDTO(User user) {
@@ -50,5 +60,16 @@ public class UserDTO {
         return "Имя: " + name +
                 "; E-mail: " + email +
                 "; возраст: " + age;
+    }
+
+    @Override
+    public int hashCode() {
+        return email.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        UserDTO dto = (UserDTO) obj;
+        return name.equals(dto.getName()) && email.equals(dto.getEmail()) && age == dto.getAge();
     }
 }
