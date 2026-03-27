@@ -8,14 +8,14 @@ import jakarta.validation.constraints.Pattern;
 
 public class UserDTO {
 
-//    @Pattern(regexp = "^\\p{L}+$", message = "Некорректное имя")
+    @Pattern(regexp = "^\\p{L}+$", message = "Некорректное имя")
     private String name;
 
-//    @Email(message = "Некорректный E-mail")
+    @Email(message = "Некорректный E-mail")
     private String email;
 
-//    @Min(value = 18, message = "Возраст не может менее 18")
-//    @Max(value = 100, message = "Возраст не может более 100")
+    @Min(value = 18, message = "Возраст не может менее 18")
+    @Max(value = 100, message = "Возраст не может более 100")
     private int age;
 
     public UserDTO(User user) {

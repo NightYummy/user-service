@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,16 +18,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceIntegrationTest {
 
     @Container
-    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:latest")
+    static PostgreSQLContainer container = new PostgreSQLContainer("postgres:latest")
         .withDatabaseName("test")
         .withUsername("test")
         .withPassword("test");
 
     @Autowired
-    private UserService userService;
+    UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    UserRepository userRepository;
 
     @DynamicPropertySource
     static void setup(DynamicPropertyRegistry registry) {
@@ -87,7 +87,7 @@ public class UserServiceIntegrationTest {
         userService.createUser(user);
 
         UserDTO found = userService.getUserByEmail("igor@mail.ru");
-        userService.deleteUser(found);
+        userService.deleteUser(found.getEmail());
 
         assertThrows(RuntimeException.class, () -> userService.getUserByEmail("igor@mail.ru"));
     }

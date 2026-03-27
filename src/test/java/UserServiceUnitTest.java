@@ -1,6 +1,7 @@
 import com.nightyummy.dao.UserRepository;
 import com.nightyummy.dto.UserDTO;
 import com.nightyummy.entity.User;
+import com.nightyummy.service.UserEventProducer;
 import com.nightyummy.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,9 @@ public class UserServiceUnitTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private UserEventProducer userEventProducer;
 
     @InjectMocks
     private UserService userService;
@@ -79,7 +83,7 @@ public class UserServiceUnitTest {
         when(userRepository.findByEmail("igor@mail.com")).thenReturn(Optional.of(user));
         doNothing().when(userRepository).delete(any(User.class));
 
-        userService.deleteUser(new UserDTO(user));
+        userService.deleteUser(user.getEmail());
 
         verify(userRepository).delete(any(User.class));
     }

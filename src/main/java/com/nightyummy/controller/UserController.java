@@ -18,23 +18,42 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createUser(@Valid @RequestBody UserDTO user) {
-        userService.createUser(user);
+    public UserDTO createUser(@Valid @RequestBody UserDTO dto) {
+        try {
+            return userService.createUser(dto);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     @GetMapping("/{email}")
     public UserDTO getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+        try {
+            return userService.getUserByEmail(email);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
     @PutMapping("/{email}")
-    public UserDTO updateUser(@PathVariable String email, @Valid @RequestBody UserDTO request) {
-        return userService.updateUser(email, request);
+    public UserDTO updateUser(@PathVariable String email, @Valid @RequestBody UserDTO dto) {
+        try {
+            return userService.updateUser(email, dto);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return userService.getUserByEmail(email);
+        }
     }
 
     @DeleteMapping("/{email}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable String email) {
-        userService.deleteUser(userService.getUserByEmail(email));
+        try {
+            userService.deleteUser(email);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
