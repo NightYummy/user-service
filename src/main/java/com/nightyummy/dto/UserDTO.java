@@ -1,21 +1,26 @@
 package com.nightyummy.dto;
 
 import com.nightyummy.entity.User;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 
+@Schema(name = "User", description = "User data")
 public class UserDTO {
 
-    @Pattern(regexp = "^\\p{L}+$", message = "Некорректное имя")
+    @Schema(description = "User's name", example = "Ivan")
+    @Pattern(regexp = "^\\p{L}+$", message = "Invalid name")
     private String name;
 
-    @Email(message = "Некорректный E-mail")
+    @Schema(description = "User's email", example = "ivan@mail.ru")
+    @Email(message = "Invalid E-mail")
     private String email;
 
-    @Min(value = 18, message = "Возраст не может менее 18")
-    @Max(value = 100, message = "Возраст не может более 100")
+    @Schema(description = "User's age", example = "25")
+    @Min(value = 18, message = "Age must be more than 18")
+    @Max(value = 100, message = "Age cannot exceed 100")
     private int age;
 
     public UserDTO(User user) {
@@ -57,9 +62,9 @@ public class UserDTO {
 
     @Override
     public String toString() {
-        return "Имя: " + name +
+        return "Name: " + name +
                 "; E-mail: " + email +
-                "; возраст: " + age;
+                "; age: " + age;
     }
 
     @Override
