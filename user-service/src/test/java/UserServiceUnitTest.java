@@ -3,7 +3,6 @@ import com.nightyummy.dto.UserDTO;
 import com.nightyummy.entity.User;
 import com.nightyummy.service.UserEventProducer;
 import com.nightyummy.service.UserService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,11 +25,6 @@ public class UserServiceUnitTest {
 
     @InjectMocks
     private UserService userService;
-
-    @BeforeEach
-    void setup() {
-
-    }
 
     @Test
     void testSaveUser() {

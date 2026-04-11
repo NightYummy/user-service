@@ -9,7 +9,6 @@
         <groupId>com.nightyummy</groupId>
         <artifactId>user-application</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath/>
     </parent>
 
     <dependencies>
@@ -28,4 +27,5 @@
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
     </dependencies>
+
 </project>

@@ -1,24 +1,29 @@
-import com.nightyummy.Main;
+import com.nightyummy.UserApplication;
 import com.nightyummy.dao.UserRepository;
 import com.nightyummy.dto.UserDTO;
+import com.nightyummy.service.UserEventProducer;
 import com.nightyummy.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.postgresql.PostgreSQLContainer;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @Testcontainers
-@SpringBootTest(classes = Main.class)
+@SpringBootTest(classes = UserApplication.class)
 public class UserServiceIntegrationTest {
 
     @Container
-    static PostgreSQLContainer container = new PostgreSQLContainer("postgres:latest")
+    static PostgreSQLContainer<?> container = new PostgreSQLContainer("postgres:latest")
         .withDatabaseName("test")
         .withUsername("test")
         .withPassword("test");
@@ -29,17 +34,25 @@ public class UserServiceIntegrationTest {
     @Autowired
     UserRepository userRepository;
 
+    @MockitoBean
+    private UserEventProducer userEventProducer;
+
+    @MockitoBean
+    private JavaMailSender javaMailSender;
+
     @DynamicPropertySource
     static void setup(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", container::getJdbcUrl);
         registry.add("spring.datasource.username", container::getUsername);
         registry.add("spring.datasource.password", container::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.kafka.bootstrap-servers", () -> "localhost:9092");
     }
 
     @BeforeEach
     void clearTable() {
         userRepository.deleteAll();
+        reset(userEventProducer);
     }
 
     @Test
@@ -51,6 +64,8 @@ public class UserServiceIntegrationTest {
         assertEquals("Igor", saved.getName());
         assertEquals("igor@mail.ru", saved.getEmail());
         assertEquals(26, saved.getAge());
+
+        verify(userEventProducer, times(1)).send(any());
 
         UserDTO found = userService.getUserByEmail("igor@mail.ru");
         assertNotNull(found);
